@@ -11,6 +11,19 @@
 % Set Margins to 3/4"
 \usepackage[margin=0.75in]{geometry}
 
+%---------- Math Packages ----------%
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{mathtools}
+\usepackage{amsthm}
+
+% Define theorem styles
+\newtheorem{thm}{Theorem}
+
+\theoremstyle{definition}
+\newtheorem{defn}{Definition}
+\newtheorem{example}{Example}
+
 %---------- Bibliography Style ----------%
 \usepackage[style=ieee,backend=biber]{biblatex}
 \addbibresource{bib.bib}
@@ -24,6 +37,43 @@
 \cite{topology-robot-arm}
     
 \section{Introduction}
+One common approach to controlling robotic manipulators 
+(known colloquially as ``robot arms") is to pick a pose of the end effector and
+reverse-engineer the joint angles required to reach this pose. This is known as
+the \textbf{inverse kinematics} problem. For an arm with \(n\) revolute joints, 
+one can model the desired end effector position and orientation by
+\(x \in \mathbb{R}^3 \times SO(3)\) and the angles of the joints by 
+\(\theta \in \mathbb{T}^n\). The inverse kinematics problem requires solving the
+equation \(f(\theta) = x\) for \(\theta\), where \(f\) is an 
+appropriately-defined function \cite{program-kin-red-manips}.
+
+\begin{example}
+%TODO: the 2D planar manipulator image.
+
+The 2D planar manipulator with two revolute joints of lengths \(r_1\)
+and \(r_2\) (Figure ????) whose end-effector is fixed in orientation with the
+second joint has position \((x,y) \in \mathbb{R}^2\) and joint angles 
+\(\theta = (\theta_1,\theta_2) \in \mathbb{T}^2\). 
+The relation connecting these two is given by (\ref{eqn:2d-planar-manip}).
+\begin{equation}\label{eqn:2d-planar-manip}
+    \begin{bmatrix}x \\ y \end{bmatrix}
+    = \begin{bmatrix} 
+        r_1\cos(\theta_1) + r_2\cos(\theta_1 + \theta_2) \\
+        r_1\sin(\theta_1) + r_2\sin(\theta_1 + \theta_2)
+    \end{bmatrix} =: f(\theta)
+\end{equation}
+\end{example}
+Unfortunately, there always exist joint angles where the relationship 
+\(x = f(\theta)\) breaks down. These points are called 
+\textbf{singular configurations}. If the dimension of the workspace is 
+\(k > 0\), the singular configurations are characterized by the set
+\[
+    S = \left\{ \theta_0 \in \mathbb{T}^n \mid 
+    \text{rank}\left\{
+        \frac{\partial f}{\partial\theta}(\theta_0) 
+    \right\} < k \right\}
+\]
+
 What is the inverse kinematics problem? Why do we care? What is usually done by
 roboticists? How can Topology help us do this differently?
 
