@@ -1,7 +1,16 @@
 %! TEX program = lualatex
 
+% This project should be between 5-6 pages.
+% No cover page required.
+% Font should be 12pt, with 3/4" margins on all sides.
+% It should be properly written, divided into sections, 
+% and must contain a proper introduction and bibliography.
+
 \documentclass[12pt]{article}
 %/========== Preamble ==========/%
+% Set Margins to 3/4"
+\usepackage[margin=0.75in]{geometry}
+
 %---------- Bibliography Style ----------%
 \usepackage[style=ieee,backend=biber]{biblatex}
 \addbibresource{bib.bib}
@@ -14,6 +23,29 @@
 \cite{topology-fiber-bundles}
 \cite{topology-robot-arm}
     
+\section{Introduction}
+What is the inverse kinematics problem? Why do we care? What is usually done by
+roboticists? How can Topology help us do this differently?
+
+\section{Relevant Background}
+Define the following, and when possible give examples.
+\begin{itemize}
+    \item fiber bundles and locally trivial fibrations
+    \item bundle maps
+    \item submersions
+    \item homotopies
+    \item homotopy-exact sequences
+    \item homologies
+    \item group torsion
+    \item group generators
+    \item cross-sections
+    \item pullback bundle
+\end{itemize}
+Also cover \textbf{Ehresmann's Theorem}.
+
+\section{Topology and the Robot Arm}
+Summary of the paper in my own words, with plain English, and diagrams using the
+2-link planar manipulator with configuration space T2.
 %---------- Bibliography ----------%
 %\newpage
 % This adds a line for the Bibliography in the Table of Contents.
