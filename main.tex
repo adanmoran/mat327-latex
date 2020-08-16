@@ -1,0 +1,25 @@
+%! TEX program = lualatex
+
+\documentclass[12pt]{article}
+%/========== Preamble ==========/%
+%---------- Bibliography Style ----------%
+\usepackage[style=ieee,backend=biber]{biblatex}
+\addbibresource{bib.bib}
+
+%/========== Main Document ==========/%
+\begin{document}
+% TEST CITATIONS
+\cite{program-kin-red-manips}
+\cite{robots-fiber-bundles}
+\cite{topology-fiber-bundles}
+\cite{topology-robot-arm}
+    
+%---------- Bibliography ----------%
+%\newpage
+% This adds a line for the Bibliography in the Table of Contents.
+\addcontentsline{toc}{chapter}{Bibliography}
+\printbibliography
+\end{document}
+%/========== /Main Document ==========/%
+
+% vim: set tw=80 ts=4 sw=4 sts=0 et ffs=unix :
