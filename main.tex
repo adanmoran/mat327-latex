@@ -30,11 +30,6 @@
 
 %/========== Main Document ==========/%
 \begin{document}
-% TEST CITATIONS
-\cite{program-kin-red-manips}
-\cite{robots-fiber-bundles}
-\cite{topology-fiber-bundles}
-\cite{topology-robot-arm}
     
 \section{Introduction}
 One common approach to controlling robotic manipulators 
@@ -43,26 +38,11 @@ reverse-engineer the joint angles required to reach this pose. This is known as
 the \textbf{inverse kinematics} problem. For an arm with \(n\) revolute joints, 
 one can model the desired end effector position and orientation by
 \(x \in \mathbb{R}^3 \times SO(3)\) and the angles of the joints by 
-\(\theta \in \mathbb{T}^n\). The inverse kinematics problem requires solving the
+\(\theta \in \mathbb{T}^n\) \cite{robots-fiber-bundles}. 
+The inverse kinematics problem requires solving the
 equation \(f(\theta) = x\) for \(\theta\), where \(f\) is an 
 appropriately-defined function \cite{program-kin-red-manips}.
 
-\begin{example}
-%TODO: the 2D planar manipulator image.
-
-The 2D planar manipulator with two revolute joints of lengths \(r_1\)
-and \(r_2\) (Figure ????) whose end-effector is fixed in orientation with the
-second joint has position \((x,y) \in \mathbb{R}^2\) and joint angles 
-\(\theta = (\theta_1,\theta_2) \in \mathbb{T}^2\). 
-The relation connecting these two is given by (\ref{eqn:2d-planar-manip}).
-\begin{equation}\label{eqn:2d-planar-manip}
-    \begin{bmatrix}x \\ y \end{bmatrix}
-    = \begin{bmatrix} 
-        r_1\cos(\theta_1) + r_2\cos(\theta_1 + \theta_2) \\
-        r_1\sin(\theta_1) + r_2\sin(\theta_1 + \theta_2)
-    \end{bmatrix} =: f(\theta)
-\end{equation}
-\end{example}
 Unfortunately, there always exist joint angles where the relationship 
 \(x = f(\theta)\) breaks down. These points are called 
 \textbf{singular configurations}. If the dimension of the workspace is 
@@ -74,28 +54,177 @@ Unfortunately, there always exist joint angles where the relationship
     \right\} < k \right\}
 \]
 
-What is the inverse kinematics problem? Why do we care? What is usually done by
-roboticists? How can Topology help us do this differently?
+\begin{example}
+%TODO: the 2D planar manipulator image.
+
+The 2D planar manipulator with two revolute joints of lengths \(r_1 > 0\)
+and \(r_2 > 0\) (Figure ????) whose end-effector is fixed in orientation with the
+second joint has position \((x,y) \in \mathbb{R}^2\) and joint angles 
+\(\theta = (\theta_1,\theta_2) \in \mathbb{T}^2\). 
+The relation connecting these two is given by (\ref{eqn:2d-planar-manip}).
+\begin{equation}\label{eqn:2d-planar-manip}
+    \begin{bmatrix}x \\ y \end{bmatrix}
+    = \begin{bmatrix} 
+        r_1\cos(\theta_1) + r_2\cos(\theta_1 + \theta_2) \\
+        r_1\sin(\theta_1) + r_2\sin(\theta_1 + \theta_2)
+    \end{bmatrix} =: f(\theta)
+\end{equation}
+
+The Jacobian has determinant
+\[
+    \left| \frac{\partial f}{\partial \theta} \right| = r_1r_2\sin(\theta_2)
+\]
+which means the singular configurations are 
+\(S = \left\{ (\theta_1,\theta_2) \in \mathbb{T}^2 \mid \theta_2 = \pm\pi\right\}\); 
+that is, the singular configurations of this robot arm are exactly when the
+second joint is colinear with the first joint.
+\end{example}
+
+Singularities cause various issues when controlling robot arms, as the
+controllers will demand infinite torque be applied to track specific positions
+or velocities when near these configurations. For this reason, it is preferable
+to avoid singular configurations when possible. In particular, when generating a
+trajectory for the end-effector, a good control mechanism should avoid choosing
+joint positions which land ``close to" the singular configurations.
+
+Previous researchers have tried to solve this problem using extra limbs
+\cite{program-kin-red-manips} and velocity constraints
+\cite{articulated-robot-redundancy}, among other approaches involving kinematic
+models of the robots. The authors of
+``Topology and the Robot Arm" offer a different approach: they ask whether
+avoiding kinematic singularities is possible at all, and prove when it can be
+done using the topology of the robot's configuration space
+\cite{topology-robot-arm}.
+
+This report will cover the relevant background required to understand 
+``Topology and the Robot Arm",
+and will summarize the results of the paper.
 
 \section{Relevant Background}
-Define the following, and when possible give examples.
-\begin{itemize}
-    \item fiber bundles and locally trivial fibrations
-    \item bundle maps
-    \item submersions
-    \item homotopies
-    \item homotopy-exact sequences
-    \item homologies
-    \item group torsion
-    \item group generators
-    \item cross-sections
-    \item pullback bundle
-\end{itemize}
-Also cover \textbf{Ehresmann's Theorem}.
+\begin{defn}[Fiber bundles \cite{topology-fiber-bundles}]
+    Let \(E\), \(X\), and \(F \subset E\) be topological spaces, 
+    with \(X\) connected.
+    Let \(f : E \rightarrow X\) be a continous surjective function. 
+    We say \(f\) is a \textbf{locally trivial fibration} or a 
+    \textbf{fiber bundle with fiber \(F\)} and write 
+    \(F \rightarrow E \xrightarrow[]{f} X\) when
+    \begin{enumerate}
+        \item \(f^{-1}(\{x_0\}) = F \, \forall x_0 \in X\)
+        \item \((\forall x \in X)\) there is an open neighbourhood of \(x\)
+            \(U_x \subset X\) and a homeomorphism
+            \(\psi_x : f^{-1}(U_x) \rightarrow U_x \times F\) so that
+            \(f\vert_{f^{-1}(U_x)} = \pi_1 \circ \psi_x\) (where \(\pi_1\)
+            is the projection map of \(U_x \times F\) onto \(U_x\))
+    \end{enumerate}
+    Note that it is common to say that \(E\) itself is the fiber bundle over
+    \(X\) if \(E = X \times F\), since the natural projection 
+    \(\pi : X \times F \rightarrow X\) is a fiber bundle.
+\end{defn}
+
+\begin{defn}[Vector bundles \cite{topology-fiber-bundles}]
+    Let \(V \rightarrow E \xrightarrow[]{f} E\) be a fiber bundle and \(V\) an
+    \(n\)-dimensional vector space. We say \(f\) is a
+    \textbf{vector bundle} if \(\psi_x\) satisfies
+    \(\psi_x \vert_{x_1} : f^{-1}(x_1) \rightarrow {x_1}\times V\) is a linear
+    isomorphism for any \(x_1 \in U_x\).
+\end{defn}
+
+\begin{example}
+    A mechanical system can be modelled by a configuration manifold
+    \(\mathcal{Q} = \mathbb{R}^n \times (\mathbb{S}^1)^m\). At each
+    \(q \in \mathcal{Q}\), the velocity of the system lies in the so-called
+    tangent space \(T_q\mathcal{Q}\), which is an \(n+m\)-dimensional vector
+    space. 
+    The collection of tangent spaces
+    \(T\mathcal{Q} := \left\{(q,v) \mid q \in \mathcal{Q}, v \in
+    T_q\mathcal{Q}\right\}\) is called the \textit{tangent bundle} of
+    \(\mathcal{Q}\). The natural
+    projection \(\pi : T\mathcal{Q} \rightarrow \mathcal{Q}\) given by 
+    \(\pi(q,v) = q\) is a vector bundle, because the fibers 
+    \(\pi^{-1}(q) = T_q\mathcal{Q}\) are isomorphic to 
+    \({q} \times \mathbb{R}^{n+m}\).
+\end{example}
+
+\begin{defn}[Cross-sections \cite{topology-fiber-bundles}]
+    Let \(F \rightarrow E \xrightarrow[]{f} X\) be a fiber bundle.
+    A \textbf{cross-section} is a continuous map \(\sigma : X \rightarrow E\)
+    such that \(f \circ \sigma = \text{id}_X\).
+\end{defn}
+
+\begin{defn}[Bundle maps \cite{topology-fiber-bundles}]
+    Let \(F_1 \rightarrow E_1 \xrightarrow[]{f_1} X_1\) and 
+    \(F_2 \rightarrow E_2 \xrightarrow[]{f_2} X_2\) be fiber bundles. A
+    continuous function \(\phi : E_1 \rightarrow E_2\) is a \textbf{bundle map}
+    if there is a continuous function \(g : X_1 \rightarrow X_2\) so that
+    \(g \circ f_1 = f_2 \circ \phi\).
+\end{defn}
+
+\begin{defn}[Pullback \cite{topology-fiber-bundles}]
+    Let \(F \rightarrow E \xrightarrow[]{f} X\) be a fiber bundle. Let \(Y\) be
+    a topological space and \(g : Y \rightarrow X\) a continuous function. The
+    \textbf{pullback bundle over \(Y\)} is 
+    \(g^\star(E) := \left\{ (y,e)\in Y \times E \mid g(y) = f(e)\right\}\). The
+    natural projection \(\pi_Y : g^\star(E) \rightarrow Y\) with 
+    \((y,e) \mapsto y\) is a fiber bundle with fiber \(F\).
+\end{defn}
+
+\begin{defn}[Manifolds \cite{intro-top-manifolds}]
+    A topological space \(M\) is a manifold of dimension \(n\) if for any
+    \(p \in M\) there exists an open neighbourhood \(U \subset M\) of \(p\)
+    which is homeomorphic to an open subset of \(\mathbb{R}^n\).
+\end{defn}
+
+\begin{defn}[Submersions \cite{robots-fiber-bundles}]
+    Let \(M\) and \(N\) be manifolds. A map \(h : M \rightarrow N\) is a
+    \textbf{submersion} if it contains no singular points (that is, its Jacobian
+    is always full rank).
+\end{defn}
+
+\begin{defn}[Groups \cite{intro-top-manifolds}]
+    A \textbf{group} is a set \(G\) and an operation 
+    \(\cdot : G\times G \rightarrow G\) with \((g,h) \mapsto gh\), along with
+    the following axioms:
+    \begin{enumerate}
+        \item For all \(g,h,k \in G\), \((gh)k = g(hk)\).
+        \item There exists an identity \(e \in G\) so that for all \(g \in G\)
+            we have \(eg = ge = g\).
+        \item For all \(g \in G\) there is an inverse \(h \in G\) so that
+        \(gh = e\)
+    \end{enumerate}
+    If additionally the group satisfies \(gh = hg\) for all \(g,h \in G\), the
+    group is called \textbf{abelian}.
+\end{defn}
+
+\begin{defn}[Group Homomorphism \cite{intro-top-manifolds}]
+    Let \(G\) and \(H\) be groups. A function \(f : G \rightarrow H\) is a
+    \textbf{homomorphism} if \(f(g_1g_2) = f(g_1)f(g_2)\) for all 
+    \(g_1,g_2 \in G\).
+\end{defn}
+
+\begin{defn}[Group Torsion \cite{intro-top-manifolds}]
+    An abelian group \(G\) is a \textbf{torsion group} if for each \(g \in G\),
+    there exists \(n \in \mathbb{N}\) so that \(g^n = e\). If this is not the
+    case, \(G\) is said to be \textbf{torsion-free}.
+\end{defn}
+
+%TODO: Fill this in and citation
+\begin{defn}[Homotopy-Exact Sequence \cite{}]
+
+\end{defn}
+
+%TODO: Fill this in
+\begin{defn}[Homology \cite{intro-top-manifolds}]
+
+\end{defn}
+
+%TODO: Cover Ehresmann's Theorem (see Robots and Fiber Bundles)
 
 \section{Topology and the Robot Arm}
 Summary of the paper in my own words, with plain English, and diagrams using the
 2-link planar manipulator with configuration space T2.
+
+The goal of the paper is to find a cross-section which is the map
+that solves the inverse kinematics problem while avoiding singularities.
 %---------- Bibliography ----------%
 %\newpage
 % This adds a line for the Bibliography in the Table of Contents.
