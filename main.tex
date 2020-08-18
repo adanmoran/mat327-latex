@@ -19,6 +19,7 @@
 
 % Define theorem styles
 \newtheorem{thm}{Theorem}
+\newtheorem{prop}{Proposition}
 \newtheorem*{cor}{Corollary}
 
 \theoremstyle{definition}
@@ -135,7 +136,7 @@ and will summarize the results of the paper.
     isomorphism for any \(x_1 \in U_x\).
 \end{defn}
 
-\begin{example}
+\begin{example}\label{ex:tangent-bundle}
     A mechanical system can be modelled by a configuration manifold
     \(\mathcal{Q} = \mathbb{R}^n \times (\mathbb{S}^1)^m\). At each
     \(q \in \mathcal{Q}\), the velocity of the system lies in the so-called
@@ -178,6 +179,13 @@ and will summarize the results of the paper.
     A topological space \(M\) is a manifold of dimension \(n\) if for any
     \(p \in M\) there exists an open neighbourhood \(U \subset M\) of \(p\)
     which is homeomorphic to an open subset of \(\mathbb{R}^n\).
+\end{defn}
+
+\begin{defn}[Tangent Bundles \cite{geometric-control}]
+    Let \(M\) be a manifold and \(m \in M\). The set \(T_mM\) consisting of
+    tangents of curves at \(m\) is called the \textbf{tangent space} of \(M\) at
+    \(m\). The set \(TM := \left\{(m,v) | m \in M,\, v \in T_mM\right\}\) is
+    called the \textbf{tangent bundle} of \(M\).
 \end{defn}
 
 \begin{defn}[Submersions \cite{robots-fiber-bundles}]
@@ -244,6 +252,7 @@ This section covers a summary of \cite{topology-robot-arm}. We will not cover
 all proofs of the results from this paper, and when possible we
 will try to motivate why the results are true by using concrete examples.
 
+\subsection{The Global Inverse Kinematics Problem}
 At the start of the paper, he authors note that a robot arm can be represented
 by a series of links. Let \(l_1\) be the first link in the robot arm, which is
 attached to the base and can rotate about the fixed line \(y_1\) in 3D space.
@@ -344,18 +353,51 @@ this paper.
     \(s : SO(3) \rightarrow \mathbb{T}^n\) so that \(R \circ s = \text{id}\). 
     Looking at the fundamental groups, existence of a cross-section would imply
     that \(R_* \circ s_* = \text{id}_{\pi_1(SO(3)}\). This is impossible, since
-    \(\pi_1(\mathbb{T}^n)\) is torsion-free (and hence is not cyclic) while
-    \(\pi_1(SO(3))\) is the cyclyc group of order 2. If \(w \circ R\) had a
-    cross-section \(s'\), then \(\text{id}_\mathbb{S}^2\) would be homotopic to
-    a constant (which it is not).
+    \(\pi_1(\mathbb{T}^n)\) is torsion-free, while
+    \(\pi_1(SO(3))\) is the cyclyc group of order 2 (which has torsion). 
+    If \(w \circ R\) had a cross-section \(s'\), then \(\text{id}_\mathbb{S}^2\)
+    would be homotopic to a constant (which it is not).
 \end{proof}
 
 Finding a cross-section to \(R\) is equivalent to finding a continuous map which
 gives joint angle \(\theta \in \mathbb{T}^n\) for any end-effector orientation.
 In other words, this corollary tells us there is no global, continuous solution
-to the inverse kinematics problem. The rest of the paper focuses on creating a
-map which avoids singularities and solves the inverse kinematics problem on a
-subset of the joint space \(\mathbb{T}^n\).
+to the inverse kinematics problem.
+
+\subsection{Avoiding Singularities}
+The rest of the paper focuses on solving the inverse kinematics problem while
+avoiding singularities. 
+The authors suggest finding some set \(D\) and a map \(\hat{f} : D \rightarrow
+\mathbb{T}^n \\ S\) so that \(R \circ \hat{f}\) has no singularities.
+
+\begin{prop}
+    If \(D\) is a closed manifold, \(R \circ \hat{f}\) will have singularities.
+\end{prop}
+\begin{proof}
+    Suppose \(R \circ \hat{f}\) has no singularities. Then neither will 
+    \(w \circ R \circ \hat{f} : D \rightarrow \mathbb{S}^2\), since \(w\) is a
+    projection map of a fiber bundle. By definition, 
+    this means \(w \circ R \circ \hat{f}\) is a submersion.
+    By Ehresmann's theorem, since \(D\) and \(\mathbb{S}^2\) are closed
+    manifolds, \(w \circ R \circ \hat{f}\) is a locally trivial fibration with
+    some fiber \(F\).
+    Let \(\Omega\mathbb{S}^2\) be the set of all loops based in X (the ``loop
+    space").
+    The authors claim \(F\) must be a finite-dimensional manifold homotopic to
+    \(D \times \Omega\mathbb{S}^2\) because \(w \circ R \circ \hat{f}\) is
+    homotopic to the constant map \(w \circ R_1 \circ \hat{f}\). I was unable to
+    find a source on this claim, so we will take it as fact.
+    Since homology is preserved under homotopy \cite{intro-top-manifolds}, and
+    the homology of finite-dimensional manifolds is finite dimensional, the
+    homology of \(D \times \Omega\mathbb{S}^2\) should also be finite
+    dimensional. The authors claim this is not the case (again, I could not find
+    a good source proving this claim), giving a contradiction.
+\end{proof}
+
+Changing the notation of the paper slightly, let \(TSO(3)\) be the tangent
+bundle to \(SO(3)\) with projection map \(p\). 
+Let \(R^*TSO(3)\) be the pullback bundle of 
+
 
 %The goal of the paper is to find a cross-section which is the map
 %that solves the inverse kinematics problem while avoiding singularities.
