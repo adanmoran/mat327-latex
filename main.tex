@@ -19,10 +19,12 @@
 
 % Define theorem styles
 \newtheorem{thm}{Theorem}
+\newtheorem*{cor}{Corollary}
 
 \theoremstyle{definition}
 \newtheorem{defn}{Definition}
 \newtheorem{example}{Example}
+\newtheorem*{notation}{Notation}
 
 %---------- Bibliography Style ----------%
 \usepackage[style=ieee,backend=biber]{biblatex}
@@ -35,10 +37,10 @@
 One common approach to controlling robotic manipulators 
 (known colloquially as ``robot arms") is to pick a pose of the end effector and
 reverse-engineer the joint angles required to reach this pose. This is known as
-the \textbf{inverse kinematics} problem. For an arm with \(n\) revolute joints, 
-one can model the desired end effector position and orientation by
-\(x \in \mathbb{R}^3 \times SO(3)\) and the angles of the joints by 
-\(\theta \in \mathbb{T}^n\) \cite{robots-fiber-bundles}. 
+the \textbf{inverse kinematics} problem. For an arm with \(n\) rotating 
+(also known as revolute) joints, one can model the desired end effector position
+and orientation by \(x \in \mathbb{R}^3 \times SO(3)\) and the angles of the
+joints by \(\theta \in \mathbb{T}^n\) \cite{robots-fiber-bundles}. 
 The inverse kinematics problem requires solving the
 equation \(f(\theta) = x\) for \(\theta\), where \(f\) is an 
 appropriately-defined function \cite{program-kin-red-manips}.
@@ -57,9 +59,13 @@ Unfortunately, there always exist joint angles where the relationship
 \begin{example}
 %TODO: the 2D planar manipulator image.
 
-The 2D planar manipulator with two revolute joints of lengths \(r_1 > 0\)
-and \(r_2 > 0\) (Figure ????) whose end-effector is fixed in orientation with the
-second joint has position \((x,y) \in \mathbb{R}^2\) and joint angles 
+    \begin{figure}
+
+        \caption{}\label{fig:2-link-arm}
+    \end{figure}
+    The 2D planar manipulator with two revolute joints of fixed lengths \(r_1 > 0\)
+and \(r_2 > 0\) (Figure ????), whose end-effector's orientation is the same
+as the second joint's, has position \((x,y) \in \mathbb{R}^2\) and joint angles 
 \(\theta = (\theta_1,\theta_2) \in \mathbb{T}^2\). 
 The relation connecting these two is given by (\ref{eqn:2d-planar-manip}).
 \begin{equation}\label{eqn:2d-planar-manip}
@@ -81,8 +87,8 @@ second joint is colinear with the first joint.
 \end{example}
 
 Singularities cause various issues when controlling robot arms, as the
-controllers will demand infinite torque be applied to track specific positions
-or velocities when near these configurations. For this reason, it is preferable
+controllers will attempt to apply infinite torque to move the arm a 
+small amount. For this reason, it is preferable
 to avoid singular configurations when possible. In particular, when generating a
 trajectory for the end-effector, a good control mechanism should avoid choosing
 joint positions which land ``close to" the singular configurations.
@@ -208,8 +214,15 @@ and will summarize the results of the paper.
 \end{defn}
 
 %TODO: Fill this in and citation
-\begin{defn}[Homotopy-Exact Sequence \cite{}]
-
+\begin{defn}[Exact Sequence \cite{intro-top-manifolds}]
+    A sequence of abelian groups \(\{G_1, G_2, \ldots\}\) and
+    homomorphisms \(\alpha_p : G_p \rightarrow G_{p-1}\)
+    \[
+        \cdots \rightarrow G_{p+1} \xrightarrow{\alpha_{p+1}} G_p
+    \xrightarrow{\alpha_p} G_{p-1} \rightarrow \cdots
+    \]
+    is \textbf{exact} if \(\text{Image}(\alpha_{p+1}) = \text{Ker}(\alpha_p)\)
+    for all \(p\).
 \end{defn}
 
 %TODO: Fill this in
@@ -217,14 +230,135 @@ and will summarize the results of the paper.
 
 \end{defn}
 
+\begin{notation}
+    The notation
+    \(f : X \xrightarrow{\alpha} Y \xrightarrow{\beta} Z\)
+    means that \(f = \beta \circ \alpha\) where
+    \(\alpha : X \rightarrow Y\) and \(\beta : Y \rightarrow Z\).
+\end{notation}
+
 %TODO: Cover Ehresmann's Theorem (see Robots and Fiber Bundles)
 
 \section{Topology and the Robot Arm}
-Summary of the paper in my own words, with plain English, and diagrams using the
-2-link planar manipulator with configuration space T2.
+This section covers a summary of \cite{topology-robot-arm}. We will not cover
+all proofs of the results from this paper, and when possible we
+will try to motivate why the results are true by using concrete examples.
 
-The goal of the paper is to find a cross-section which is the map
-that solves the inverse kinematics problem while avoiding singularities.
+At the start of the paper, he authors note that a robot arm can be represented
+by a series of links. Let \(l_1\) be the first link in the robot arm, which is
+attached to the base and can rotate about the fixed line \(y_1\) in 3D space.
+Then, attach a new link \(l_2\) to the end of \(l_1\) and pick a line \(y_2\)
+around which \(l_2\) will rotate. Building this up inductively, one creates a
+robot arm so that \(y_{i+1}\) rotates about \(y_i\). The orientation of the
+end-effector is described by a coordinate frame attached to the end of the link
+\(l_n\), whose \(x\)-axis is colinear with \(y_n\).
+
+\begin{example}
+    The 2D planar robot from Figure \ref{fig:2-link-arm} has 
+    \(y_1 = y_2 = \hat{z}\).
+\end{example}
+
+Since the end-effector's pose can be represented by a point in
+\(\mathbb{R}^3\times SO(3)\), the authors define the ``rotation map" 
+\(R : \mathbb{T}^n \rightarrow SO(3)\) as follows: 
+given \(\theta = (\theta_1,\ldots,\theta_n) \in \mathbb{T}^n\),
+the map \(R(\theta)\) rotates \(l_i\) about \(y_i\) by the angle \(\theta_i\)
+and returns the orientation of the end-effector (ignoring its position in
+3D-space). Here it is assumed that rods cannot collide with each other, which
+is a reasonable assumption as many robot arms are designed so that each limb can
+rotate completely without breaking the system.
+
+Now we arrive at the first theorem of the paper, whic characterizes the singular
+configurations of the map \(R\) in terms of the physical representation of the
+axes.
+
+\begin{thm}\label{thm:singular-plane}
+    A point \(\theta \in \mathbb{T}^n\) is a singular configuration for \(R\) if
+    and only if the axes \(\{y_1,\ldots,y_n\}\) are parallel to a plane.
+\end{thm}
+\begin{cor}
+    The set of singularities \(S \subset \mathbb{T}^n\) is 2-dimensional.
+\end{cor}
+
+The phrasing of Theorem \ref{thm:singular-plane} is somewhat confusing when we
+look at the 2D planar robot: any configuration has the axes in some plane since \(y_1\) and
+\(y_2\) are connected by the link \(l_1\). 
+In this case, we need to add an additional ``axis" (which cannot rotate) labelled
+\(y_3\) at the end of the arm. If these three lines \(y_1\), \(y_2\), and \(y_3\)
+are all in the same plane, the robot must have \(\theta_2 = \pm \pi\) and it
+must be in a singular configuration. This is shown in Figure
+\ref{fig:planar-singular-frames}, where the lines \(y_i\) are perpendicular to the
+green coordinate frames.
+To see that the set of singular configurations is 2D, observe that rotating by
+\(y_1\) keeps the axes in a plane, as would any hypothetical rotation of the
+end-effector about \(y_3\).
+
+\begin{figure}
+
+    \caption{}\label{fig:planar-singular-frames}
+\end{figure}
+
+Next, the authors make the claim that we can create a homotopy of robot arms.
+Letting \(\phi_i\) be the angle between \(y_{i+1}\) and \(y_i\), they construct
+the homotopy by shrinking each \(\phi_i\) until we get an \(n\)-link planar
+robot arm. In this case, the coordinate frame on the end-effector has an 
+\(x\)-axis which is fixed to be colinear with \(y_1\) (as is the case with our
+2-link planar arm). This gives us the homotopy \(R \sim R_1\), where \(R_1\)
+rotates the end-effector rotates about this fixed \(x\)-axis when any link
+is rotated. The amount of rotation is 
+\(\theta' = \theta_1 + \cdots + \theta_n \in \mathbb{S}^1\). This addition of
+angles is the group operation on \(\mathbb{S}^1\), so we represent this by a map
+\(\mu : \mathbb{T}^n \rightarrow \mathbb{S}^1\). 
+
+Letting \(\alpha : \mathbb{S}^1 \rightarrow SO(3)\) be the rotation map around
+the \(x\)-axis, we can now state the next result.
+\begin{thm}
+    A robot arm map \(R : \mathbb{T}^n \rightarrow SO(3)\) is homotopic to 
+    the composition 
+    \(\mathbb{T}^n \xrightarrow{\mu} \mathbb{S}^1 \xrightarrow{\alpha} SO(3)\)
+    where \(\mu\) is the group operation on \(\mathbb{S}^1\) and \(\alpha\) is a
+    group generator for \(\pi_1\left(SO(3)\right)\).
+\end{thm}
+
+That \(R\) is homotopic to the composition and \(\mu\) is the group operation on
+\(\mathbb{S}^1\) comes from the previous discussion. The proof that \(\alpha\)
+is the group generator for the fundamental group of \(SO(3)\), however, is more
+obtuse, and I do not understand the proof enough to explain it in this report. 
+
+Let now \(w : SO(3) \rightarrow \mathbb{S}^2\) be the map which takes a rotated
+coordinate frame and returns its \(x\)-axis (in the sense that the tip of the
+\(x\)-axis vector lies along a sphere).
+Since \(R\) is homotopic to \(R_1\), 
+\(w \circ R : \mathbb{T}^n \rightarrow \mathbb{S}^2\) is homotopic to 
+\(w \circ R_1\), which is constant because the \(x\)-axis of \(R_1\) is
+constant. The authors claim \(w\) creates a fiber bundle 
+\(\mathbb{S}^1 \rightarrow SO(3) \xrightarrow{w} \mathbb{S}^2\), which is a fact
+we will take for granted. This leads us to one of the most important results in
+this paper.
+
+\begin{cor}
+    There is no continuous cross-section to \(R\) or to \(w \circ R\).
+\end{cor}
+\begin{proof}
+    In this context, the cross-section is a continuous map 
+    \(s : SO(3) \rightarrow \mathbb{T}^n\) so that \(R \circ s = \text{id}\). 
+    Looking at the fundamental groups, existence of a cross-section would imply
+    that \(R_* \circ s_* = \text{id}_{\pi_1(SO(3)}\). This is impossible, since
+    \(\pi_1(\mathbb{T}^n)\) is torsion-free (and hence is not cyclic) while
+    \(\pi_1(SO(3))\) is the cyclyc group of order 2. If \(w \circ R\) had a
+    cross-section \(s'\), then \(\text{id}_\mathbb{S}^2\) would be homotopic to
+    a constant (which it is not).
+\end{proof}
+
+Finding a cross-section to \(R\) is equivalent to finding a continuous map which
+gives joint angle \(\theta \in \mathbb{T}^n\) for any end-effector orientation.
+In other words, this corollary tells us there is no global, continuous solution
+to the inverse kinematics problem. The rest of the paper focuses on creating a
+map which avoids singularities and solves the inverse kinematics problem on a
+subset of the joint space \(\mathbb{T}^n\).
+
+%The goal of the paper is to find a cross-section which is the map
+%that solves the inverse kinematics problem while avoiding singularities.
 %---------- Bibliography ----------%
 %\newpage
 % This adds a line for the Bibliography in the Table of Contents.
