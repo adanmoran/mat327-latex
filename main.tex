@@ -47,8 +47,8 @@ the \textbf{inverse kinematics} problem. For an arm with \(n\) rotating
 and orientation by \(x \in \mathbb{R}^3 \times SO(3)\) and the angles of the
 joints by \(\theta \in \mathbb{T}^n\) \cite{robots-fiber-bundles}. 
 The inverse kinematics problem requires solving the
-equation \(f(\theta) = x\) for \(\theta\), where \(f\) is an 
-appropriately-defined function \cite{program-kin-red-manips}.
+equation \(x = f(\theta)\) for \(\theta\), where \(f\) is a
+function arising from the physics of the system \cite{program-kin-red-manips}.
 
 Unfortunately, there always exist joint angles where the relationship 
 \(x = f(\theta)\) breaks down. These points are called 
@@ -62,10 +62,10 @@ Unfortunately, there always exist joint angles where the relationship
 \]
 
 \begin{example}
-%TODO: the 2D planar manipulator image.
     The 2D planar manipulator with two revolute joints of fixed lengths \(r_1 > 0\)
-    and \(r_2 > 0\) (Figure \ref{fig:2-link-arm}), whose end-effector's orientation is the same
-    as the second joint's, has position \((x,y) \in \mathbb{R}^2\) and joint angles 
+    and \(r_2 > 0\) (Figure \ref{fig:2-link-arm}), with end-effector orientation
+    equal to that of the second joint,
+    has position \((x,y) \in \mathbb{R}^2\) and joint angles 
     \(\theta = (\theta_1,\theta_2) \in \mathbb{T}^2\). 
     The relation connecting these two is given by (\ref{eqn:2d-planar-manip}).
     \begin{equation}\label{eqn:2d-planar-manip}
@@ -123,8 +123,8 @@ and will summarize the results of the paper.
 \section{Relevant Background}
 This section covers definitions, notation, and results that are required to
 fully comprehend \cite{topology-robot-arm}. It is assumed that anyone reading
-this report will have completed the material of MAT327 as taught in the summer
-of 2020.
+this report has a foundational understanding of topology, as taught 
+in the University of Toronto's MAT327 course.
 
 \begin{defn}[Fiber bundles \cite{topology-fiber-bundles}]
     Let \(E\), \(X\), and \(F \subset E\) be topological spaces, 
@@ -135,11 +135,11 @@ of 2020.
     \(F \rightarrow E \xrightarrow[]{f} X\) when
     \begin{enumerate}
         \item \(f^{-1}(\{x_0\}) = F \, \forall x_0 \in X\)
-        \item \((\forall x \in X)\) there is an open neighbourhood of \(x\)
+        \item Around each \(x \in X\) there is an open neighbourhood 
             \(U_x \subset X\) and a homeomorphism
             \(\psi_x : f^{-1}(U_x) \rightarrow U_x \times F\) so that
-            \(f\vert_{f^{-1}(U_x)} = \pi_1 \circ \psi_x\) (where \(\pi_1\)
-            is the projection map of \(U_x \times F\) onto \(U_x\))
+            \(f\vert_{f^{-1}(U_x)} = p \circ \psi_x\) (where \(p\)
+            is the projection of \(U_x \times F\) onto \(U_x\))
     \end{enumerate}
     Note that it is common to say that \(E\) itself is the fiber bundle over
     \(X\) if \(E = X \times F\), since the natural projection 
@@ -178,8 +178,8 @@ of 2020.
 \end{defn}
 
 \begin{defn}[Manifolds \cite{intro-top-manifolds}]
-    A topological space \(M\) is a manifold of dimension \(n\) if for any
-    \(p \in M\) there exists an open neighbourhood \(U \subset M\) of \(p\)
+    A topological space \(M\) is a manifold of dimension \(n\) if, around any
+    \(p \in M\), there exists an open neighbourhood \(U \subset M\) 
     which is homeomorphic to an open subset of \(\mathbb{R}^n\).
 \end{defn}
 
@@ -213,7 +213,7 @@ of 2020.
 
 \begin{defn}[Groups \cite{intro-top-manifolds}]
     A \textbf{group} is a set \(G\) and an operation 
-    \(\cdot : G\times G \rightarrow G\) with \((g,h) \mapsto gh\), along with
+    \(G\times G \rightarrow G\) mapping \((g,h) \mapsto gh\), along with
     the following axioms:
     \begin{enumerate}
         \item For all \(g,h,k \in G\), \((gh)k = g(hk)\).
@@ -263,8 +263,8 @@ of 2020.
 
 \begin{prop}[Homotopy Groups \cite{topology-fiber-bundles}]
     The homotopy group \(\pi_n(X,x_0)\) of \(n\)-loops at \(x_0\) is the
-    set of equivalence classes of maps from \(\mathbb{S}^n\) to \(X\) with the
-    homotopy group operation (as defined in \cite{intro-top-manifolds}).
+    set of equivalence classes of maps from \(\mathbb{S}^n\) to \(X\), along
+    with the homotopy group operation (see \cite{intro-top-manifolds}).
 \end{prop}
 
 \begin{notation}
@@ -307,7 +307,7 @@ of 2020.
     The \textbf{first homology group} \(H_1(X)\) of a space \(X\) the set
     characterized by the  abelianization of the fundamental group \(\pi_1(X)\):
     \[
-        H_1(X) \equiv \pi_1(X)/[\pi_1,\pi_1]]
+        H_1(X) \equiv \pi_1(X)/[\pi_1,\pi_1]
     \]
 \end{defn}
 
@@ -320,17 +320,17 @@ of 2020.
 
 \begin{thm}[Ehresmann's Theorem \cite{ehresmann}]
     Let \(M\) and \(N\) be smooth manifolds, with \(M\) a compact. 
-    Let \(f : M \rightarrow N\) be a surjectie submersion. Then \(f\) is a
+    Let \(f : M \rightarrow N\) be a surjective submersion. Then \(f\) is a
     locally trivial fibration.
 \end{thm}
 
 \section{Topology and the Robot Arm}
-This section covers a summary of \cite{topology-robot-arm}. I will not cover
-all proofs of the results from this paper. When possible I
+This section covers a summary of \cite{topology-robot-arm}. It does not cover
+all proofs of the results from this paper. When possible, we
 will try to motivate why the results are true by using concrete examples.
 
 \subsection{The Global Inverse Kinematics Problem}
-At the start of the paper, he authors note that a robot arm can be represented
+At the start of the paper, the authors note that a robot arm can be represented
 by a series of links. Let \(l_1\) be the first link in the robot arm, which is
 attached to the base and can rotate about the fixed line \(y_1\) in 3D space.
 Then, attach a new link \(l_2\) to the end of \(l_1\) and pick a line \(y_2\)
@@ -427,7 +427,7 @@ this paper.
     that \(R_* \circ s_* = \text{id}_{\pi_1(SO(3)}\). This is impossible, since
     \(\pi_1(\mathbb{T}^n)\) is torsion-free, while
     \(\pi_1(SO(3))\) is the cyclyc group of order 2 (which has torsion). 
-    If \(w \circ R\) had a cross-section \(s'\), then \(\text{id}_\mathbb{S}^2\)
+    If \(w \circ R\) had a cross-section \(s'\), then \(\text{id}_{\mathbb{S}^2}\)
     would be homotopic to a constant (which it is not).
 \end{proof}
 
@@ -467,12 +467,12 @@ The authors suggest finding some set \(D\) and a map \(\hat{f} : D \rightarrow
 \end{proof}
 
 Finally, let \(E = TSO(3)\) be the (trivial) tangent
-bundle of \(SO(3)\) with projection map \(p_E\). Let \(D = T(\mathbb{T}^n - S)\) be
-the tangent bundle of \(\mathbb{T}^n - S\) with projection map \(p_D\).
+bundle of \(SO(3)\). Let \(D = T(\mathbb{T}^n - S)\) be
+the tangent bundle of \(\mathbb{T}^n - S\). 
 Let \(R^*E\) be the pullback bundle of \(R|_{\mathbb{T}^n - S}\) onto
-\(\mathbb{T}^n - S\) with projection \(p_R\). 
+\(\mathbb{T}^n - S\).
 Then \(D\) is the set of position-velocity pairs
-\((\theta, v_\theta)\) in joint space, and \(R*E\) is the set of pairs
+\((\theta, v_\theta)\) in joint space, and \(R^*E\) is the set of pairs
 \((\theta, v_{R(\theta)})\) where \(v_{R(\theta)} \in T_{R(\theta)}SO(3)\) 
 is a velocity at the current orientation. 
 Given a starting orientation \(R(\theta_0)\), the existence of a
@@ -485,9 +485,11 @@ kinematics problem can be solved.
 \section{Conclusion}
 This report compiles the relevant bacground information to understand the paper
 ``Topology and the Robot Arm"
-\cite{topology-robot-arm} and summarizes the results of that paper.
-We find it is only possible to solve the inverse kinematics problem 
-by omitting singular configurations.
+\cite{topology-robot-arm} and summarizes the results of that paper. We attempted
+to explain the proofs, but many were beyond the level of comprehension
+attained by a student of MAT327. To summarize completely, the paper proves
+it is only possible to solve the inverse kinematics problem 
+by omitting singular configurations from the joint space of the robot arm.
 
 %---------- Bibliography ----------%
 %\newpage
