@@ -17,6 +17,10 @@
 \usepackage{mathtools}
 \usepackage{amsthm}
 
+%---------- Minipage ----------%
+\usepackage{graphicx}
+\usepackage{caption}
+
 % Define theorem styles
 \newtheorem{thm}{Theorem}
 \newtheorem{prop}{Proposition}
@@ -59,30 +63,26 @@ Unfortunately, there always exist joint angles where the relationship
 
 \begin{example}
 %TODO: the 2D planar manipulator image.
-    \begin{figure}[h]
-
-        \caption{}\label{fig:2-link-arm}
-    \end{figure}
     The 2D planar manipulator with two revolute joints of fixed lengths \(r_1 > 0\)
-and \(r_2 > 0\) (Figure ????), whose end-effector's orientation is the same
-as the second joint's, has position \((x,y) \in \mathbb{R}^2\) and joint angles 
-\(\theta = (\theta_1,\theta_2) \in \mathbb{T}^2\). 
-The relation connecting these two is given by (\ref{eqn:2d-planar-manip}).
-\begin{equation}\label{eqn:2d-planar-manip}
-    \begin{bmatrix}x \\ y \end{bmatrix}
-    = \begin{bmatrix} 
-        r_1\cos(\theta_1) + r_2\cos(\theta_1 + \theta_2) \\
-        r_1\sin(\theta_1) + r_2\sin(\theta_1 + \theta_2)
-    \end{bmatrix} =: f(\theta)
-\end{equation}
-The Jacobian has determinant
-\[
-    \left| \frac{\partial f}{\partial \theta} \right| = r_1r_2\sin(\theta_2)
-\]
-which means the singular configurations are 
-\(S = \left\{ (\theta_1,\theta_2) \in \mathbb{T}^2 \mid \theta_2 = \pm\pi\right\}\); 
-that is, the singular configurations of this robot arm are exactly when the
-second joint is colinear with the first joint.
+    and \(r_2 > 0\) (Figure \ref{fig:2-link-arm}), whose end-effector's orientation is the same
+    as the second joint's, has position \((x,y) \in \mathbb{R}^2\) and joint angles 
+    \(\theta = (\theta_1,\theta_2) \in \mathbb{T}^2\). 
+    The relation connecting these two is given by (\ref{eqn:2d-planar-manip}).
+    \begin{equation}\label{eqn:2d-planar-manip}
+        \begin{bmatrix}x \\ y \end{bmatrix}
+        = \begin{bmatrix} 
+            r_1\cos(\theta_1) + r_2\cos(\theta_1 + \theta_2) \\
+            r_1\sin(\theta_1) + r_2\sin(\theta_1 + \theta_2)
+        \end{bmatrix} =: f(\theta)
+    \end{equation}
+    The Jacobian has determinant
+    \[
+        \left| \frac{\partial f}{\partial \theta} \right| = r_1r_2\sin(\theta_2)
+    \]
+    which means the singular configurations are 
+    \(S = \left\{ (\theta_1,\theta_2) \in \mathbb{T}^2 \mid \theta_2 = \pm\pi\right\}\); 
+    that is, the singular configurations of this robot arm are exactly when the
+    second joint is colinear with the first joint.
 \end{example}
 
 Singularities cause various issues when controlling robot arms, as the
@@ -104,6 +104,21 @@ done using the topology of the robot's configuration space
 This report will cover the relevant background required to understand 
 ``Topology and the Robot Arm",
 and will summarize the results of the paper.
+
+\begin{figure}
+    \centering
+    \begin{minipage}{.45\textwidth}
+        \includegraphics[width=0.8\linewidth]{images/robot-arm.png}
+        \captionof{figure}{A 2D planar robot arm with fixed lengths and a
+        non-rotating end-effector.}\label{fig:2-link-arm}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{.45\textwidth}
+        \includegraphics[width=0.8\linewidth]{images/robot-arm-frames.png}
+        \captionof{figure}{The planar robot arm with coordinate frames attached to each pivot
+    \(y_i\).}\label{fig:planar-singular-frames}
+    \end{minipage}
+\end{figure}
 
 \section{Relevant Background}
 This section covers definitions, notation, and results that are required to
@@ -364,11 +379,6 @@ To see that the set of singular configurations is 2D, observe that rotating by
 \(y_1\) keeps the axes in a plane, as would any hypothetical rotation of the
 end-effector about \(y_3\).
 
-\begin{figure}[h]
-
-    \caption{}\label{fig:planar-singular-frames}
-\end{figure}
-
 Next, the authors make the claim that we can create a homotopy of robot arms.
 Letting \(\phi_i\) be the angle between \(y_{i+1}\) and \(y_i\), they construct
 the homotopy by shrinking each \(\phi_i\) until we get an \(n\)-link planar
@@ -430,7 +440,7 @@ to the inverse kinematics problem.
 The rest of the paper focuses on solving the inverse kinematics problem while
 avoiding singularities. 
 The authors suggest finding some set \(D\) and a map \(\hat{f} : D \rightarrow
-\mathbb{T}^n \\ S\) so that \(R \circ \hat{f}\) has no singularities.
+\mathbb{T}^n - S\) so that \(R \circ \hat{f}\) has no singularities.
 
 \begin{prop}
     If \(D\) is a closed manifold, \(R \circ \hat{f}\) will have singularities.
@@ -457,10 +467,10 @@ The authors suggest finding some set \(D\) and a map \(\hat{f} : D \rightarrow
 \end{proof}
 
 Finally, let \(E = TSO(3)\) be the (trivial) tangent
-bundle of \(SO(3)\) with projection map \(p_E\). Let \(D = T(\mathbb{T}^n\\S)\) be
-the tangent bundle of \(\mathbb{T}^n\\S\) with projection map \(p_D\).
-Let \(R^*E\) be the pullback bundle of \(R|_{\mathbb{T}^n\\S}\) onto
-\(\mathbb{T}^n\\S\) with projection \(p_R\). 
+bundle of \(SO(3)\) with projection map \(p_E\). Let \(D = T(\mathbb{T}^n - S)\) be
+the tangent bundle of \(\mathbb{T}^n - S\) with projection map \(p_D\).
+Let \(R^*E\) be the pullback bundle of \(R|_{\mathbb{T}^n - S}\) onto
+\(\mathbb{T}^n - S\) with projection \(p_R\). 
 Then \(D\) is the set of position-velocity pairs
 \((\theta, v_\theta)\) in joint space, and \(R*E\) is the set of pairs
 \((\theta, v_{R(\theta)})\) where \(v_{R(\theta)} \in T_{R(\theta)}SO(3)\) 
@@ -475,9 +485,9 @@ kinematics problem can be solved.
 \section{Conclusion}
 This report compiles the relevant bacground information to understand the paper
 ``Topology and the Robot Arm"
-\cite{topology-robot-arm}. It then summarizes the results of that paper, which
-shows that it is only possible to solve the inverse kinematics problem on the
-subset of the joint space which omits the singularities of a robot arm.
+\cite{topology-robot-arm} and summarizes the results of that paper.
+We find it is only possible to solve the inverse kinematics problem 
+by omitting singular configurations.
 
 %---------- Bibliography ----------%
 %\newpage
