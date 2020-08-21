@@ -147,7 +147,7 @@ in the University of Toronto's MAT327 course.
 \end{defn}
 
 \begin{defn}[Vector bundles \cite{topology-fiber-bundles}]
-    Let \(V \rightarrow E \xrightarrow[]{f} E\) be a fiber bundle and \(V\) an
+    Let \(V \rightarrow E \xrightarrow[]{f} X\) be a fiber bundle and \(V\) an
     \(n\)-dimensional vector space. We say \(f\) is a
     \textbf{vector bundle} if \(\psi_x\) satisfies
     \(\psi_x \vert_{x_1} : f^{-1}(x_1) \rightarrow {x_1}\times V\) is a linear
@@ -178,7 +178,7 @@ in the University of Toronto's MAT327 course.
 \end{defn}
 
 \begin{defn}[Manifolds \cite{intro-top-manifolds}]
-    A topological space \(M\) is a manifold of dimension \(n\) if, around any
+    A topological space \(M\) is a \textbf{manifold of dimension \(n\)} if, around any
     \(p \in M\), there exists an open neighbourhood \(U \subset M\) 
     which is homeomorphic to an open subset of \(\mathbb{R}^n\).
 \end{defn}
@@ -287,7 +287,8 @@ in the University of Toronto's MAT327 course.
 \end{prop}
 
 \begin{defn}[Relative Homotopy Group \cite{topology-fiber-bundles}]
-    The relative homotopy group \(\pi_n(X,A,x_0)\) is the set of equivalence classes
+    The \textbf{relative homotopy group} \(\pi_n(X,A,x_0)\) 
+    is the set of equivalence classes
     of the maps \(g : (D^n,\mathbb{S}^{n-1},t_0) \rightarrow (X, A, x_0)\)
     where \(D^n\) is the \(n\)-disk.
 \end{defn}
@@ -422,18 +423,20 @@ this paper.
 \end{cor}
 \begin{proof}
     In this context, the cross-section is a continuous map 
-    \(s : SO(3) \rightarrow \mathbb{T}^n\) so that \(R \circ s = \text{id}\). 
+    \(s : SO(3) \rightarrow \mathbb{T}^n\) so that \(R \circ s =
+    \text{id}_{SO(3)}\). 
     Looking at the fundamental groups, existence of a cross-section would imply
-    that \(R_* \circ s_* = \text{id}_{\pi_1(SO(3)}\). This is impossible, since
-    \(\pi_1(\mathbb{T}^n)\) is torsion-free, while
-    \(\pi_1(SO(3))\) is the cyclyc group of order 2 (which has torsion). 
+    that \(R_* \circ s_* = \text{id}_{\pi_1(SO(3)}\). This is impossible:
+    since \(\pi_1(SO(3))\) is torsion-free, continuoity of \(s\) would imply
+    \(\pi_1(\mathbb{T}^n)\) is also torsion-free, but is known that
+    \(\pi_1(\mathbb{T}^n)\) has torsion.
     If \(w \circ R\) had a cross-section \(s'\), then \(\text{id}_{\mathbb{S}^2}\)
     would be homotopic to a constant (which it is not).
 \end{proof}
 
-Finding a cross-section to \(R\) is equivalent to finding a continuous map which
-gives joint angle \(\theta \in \mathbb{T}^n\) for any end-effector orientation.
-In other words, this corollary tells us there is no global, continuous solution
+Since finding a cross-section to \(R\) is equivalent to finding a continuous map which
+gives a joint angle \(\theta \in \mathbb{T}^n\) for any end-effector orientation,
+this corollary tells us there is no global, continuous solution
 to the inverse kinematics problem.
 
 \subsection{Avoiding Singularities}
